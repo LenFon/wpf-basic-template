@@ -17,33 +17,29 @@ WorkBuddy 技能：**WPF 标准解决方案脚手架**（含 19 个可拷贝模�
 | 设计时 | 所有 View 根元素强制 `d:DataContext` 设计时绑定（含设计器专用无参构造分部类） |
 | 质量 | 两轮编译验证 0 错 0 警（XAML 侧 + 纯 C# 侧） |
 
-## 安装方式（WorkBuddy）
+## 安装方式（WorkBuddy 一键安装）
 
-### 方式一：git clone（推荐，可 `git pull` 持续更新）
+在 WorkBuddy 对话中直接输入：
 
-```bash
-# Windows（PowerShell / Git Bash）
-git clone https://github.com/LenFon/wpf-basic-template.git "$env:USERPROFILE\.workbuddy\skills\wpf-basic-template"
-
-# macOS / Linux
-git clone https://github.com/LenFon/wpf-basic-template.git ~/.workbuddy/skills/wpf-basic-template
+```
+安装 wpf-basic-template 技能
 ```
 
-### 方式二：下载 zip 手动安装
+WorkBuddy 会自动从推荐市场搜索并安装，安装完成后：
 
-1. 打开仓库页 → **Code → Download ZIP**
-2. 解压得到文件夹 `wpf-basic-template/`
-3. 将整个文件夹放入技能目录：
-   - **用户级（推荐，所有项目可用）**：`C:\Users\<用户名>\.workbuddy\skills\`（macOS/Linux：`~/.workbuddy/skills/`）
-   - **项目级（仅当前项目）**：`<项目目录>\.workbuddy\skills\`
+1. 在左侧【技能】面板可看到 `wpf-basic-template`
+2. 新开会话即可使用，输入「用 wpf-basic-template 技能新建一个 WPF 项目」触发
 
-> 技能目录里应直接是 `SKILL.md`，即最终路径为 `…\skills\wpf-basic-template\SKILL.md`。
+> **前提**：技能需已上架推荐市场（在 [skillhub.cn](https://skillhub.cn) 提交审核，通过后自动进入 WorkBuddy 推荐市场，所有用户可一键安装）。
+> 若 WorkBuddy 提示「未在推荐市场找到」，说明该技能尚未上架，可先采用下方备选方式，或到 skillhub.cn 发起上架。
 
-### 安装后
+### 备选：未上架时手动安装
 
-1. **重启 WorkBuddy**（或新开一个会话）使技能生效
-2. 验证：对话中输入「用 wpf-basic-template 技能新建一个 WPF 项目」，正常生成脚手架即安装成功
-3. 更新技能：clone 安装的进入目录执行 `git pull`；zip 安装的重下载覆盖即可
+```bash
+git clone https://github.com/LenFon/wpf-basic-template.git "$env:USERPROFILE\.workbuddy\skills\wpf-basic-template"
+```
+
+macOS / Linux 把目标目录换成 `~/.workbuddy/skills/wpf-basic-template`。clone 安装的后续可用 `git pull` 更新；技能目录里应直接是 `SKILL.md`，即最终路径为 `…\skills\wpf-basic-template\SKILL.md`。
 
 ## 使用方式
 
