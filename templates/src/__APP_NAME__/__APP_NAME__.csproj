@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>__APP_NAME__</RootNamespace>
+    <AssemblyName>__APP_NAME__</AssemblyName>
+  </PropertyGroup>
+
+  <!-- 版本号统一在解决方案根的 Directory.Packages.props 中集中管理，此处不带 Version -->
+  <ItemGroup>
+    <PackageReference Include="Prism.Wpf" />
+    <PackageReference Include="Prism.DryIoc" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="MaterialDesignThemes" />
+    <PackageReference Include="MaterialDesignThemes.MahApps" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Sinks.File" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\__APP_NAME__.Application\__APP_NAME__.Application.csproj" />
+    <ProjectReference Include="..\__APP_NAME__.Domain\__APP_NAME__.Domain.csproj" />
+    <ProjectReference Include="..\__APP_NAME__.Infrastructure\__APP_NAME__.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

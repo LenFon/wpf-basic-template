@@ -1,0 +1,26 @@
+<Project>
+
+  <!-- 中央包管理（CPM）：作用于解决方案根及其下所有项目。
+       各 csproj 只写 PackageReference，不带 Version。 -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!-- 类库项目不直接引包时，也一并锁定传递依赖版本，避免版本漂移 -->
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Prism：模块化 + DI + Region 导航 -->
+    <PackageVersion Include="Prism.Wpf" Version="9.0.537" />
+    <!-- Prism.Wpf 不含 DI 容器，需搭配容器包（DryIoc 为官方推荐，版本必须与 Prism.Wpf 一致） -->
+    <PackageVersion Include="Prism.DryIoc" Version="9.0.537" />
+    <!-- MVVM 源生成器：[ObservableProperty] / [RelayCommand] -->
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <!-- Material Design 主题（与 MahApps 集成包版本必须严格一致） -->
+    <PackageVersion Include="MaterialDesignThemes" Version="5.3.2" />
+    <PackageVersion Include="MaterialDesignThemes.MahApps" Version="5.3.2" />
+    <!-- Serilog：结构化日志（全局异常 + 业务日志），WPF 应用默认日志方案 -->
+    <PackageVersion Include="Serilog" Version="4.4.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+</Project>

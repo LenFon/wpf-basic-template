@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/解决方案项/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/__APP_NAME__.Application/__APP_NAME__.Application.csproj" />
+    <Project Path="src/__APP_NAME__.Domain/__APP_NAME__.Domain.csproj" />
+    <Project Path="src/__APP_NAME__.Infrastructure/__APP_NAME__.Infrastructure.csproj" />
+    <Project Path="src/__APP_NAME__/__APP_NAME__.csproj" />
+  </Folder>
+</Solution>
