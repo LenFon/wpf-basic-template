@@ -246,7 +246,7 @@ dotnet build --no-restore -p:UseSharedCompilation=false -p:EnableDefaultPageItem
 
 ## 八、维护约定（强制）
 
-- **每月至少巡检更新一次本技能**：核对「二、包组合」中全部包（Prism.Wpf/Prism.DryIoc、CommunityToolkit.Mvvm、MaterialDesignThemes/MaterialDesignThemes.MahApps、Serilog/Serilog.Sinks.File、ValueConverters）的最新【稳定版】，有新版则同步更新 SKILL.md 表格、templates/Directory.Packages.props、templates/src/__APP_NAME__/__APP_NAME__.csproj，并提交推送到 GitHub 仓库（https://github.com/LenFon/wpf-basic-template.git）。
+- **每月至少巡检更新一次本技能**：核对「二、包组合」中全部包（Prism.Wpf/Prism.DryIoc、CommunityToolkit.Mvvm、MaterialDesignThemes/MaterialDesignThemes.MahApps、Serilog/Serilog.Sinks.File、ValueConverters）的最新【稳定版】，有新版则同步更新 SKILL.md 表格、templates/Directory.Packages.props、templates/src/__APP_NAME__/__APP_NAME__.csproj。**更新后无需推送到 GitHub**，本地保留即可。
 - **只取稳定版**：禁止引入 preview/alpha/beta/rc；成对包（Prism 双包、MD 双包）版本必须严格一致。
-- 已配置自动化任务「wpf-basic-template 技能月度维护」（每月 1 日 09:00 自动巡检+推送），无需手动触发；但若当月有重大写法/坑位变更，应即时手动更新并推送，不等待月度任务。
+- 已配置自动化任务「wpf-basic-template 技能月度维护」（每月 1 日 09:00 自动巡检），无需手动触发；但若当月有重大写法/坑位变更，应即时手动更新，不等待月度任务。
 - 任何改动遵循本技能既有约定（CPM 集中管版本、csproj 不带 Version、UTF-8 写入等），保持与模板一致。
