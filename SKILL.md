@@ -1,7 +1,7 @@
 ---
 name: wpf-basic-template
-version: 1.2.1
-description: 用户标准化 WPF 脚手架（Prism 9 + Material Design 5 + CommunityToolkit.Mvvm + CPM + slnx + src 分层）。用于新建 WPF 项目/解决方案/View/UserControl，直接套用 templates/ 全套文件。内置已验证包组合、目录与分层约定、C# 13 分部属性、View 设计时绑定、共享转换器字典、跨 DLL 命名空间带 ;assembly=、纯 UTF-8（无 BOM），以及本机 DLP 环境编译验证绕法。
+version: 1.2.5
+description: 用户标准化 WPF 脚手架（Prism 9 + Material Design 5 + CommunityToolkit.Mvvm + CPM + slnx + src 分层）。用于新建 WPF 项目/解决方案/View/UserControl，直接套用 templates/ 全套文件。内置已验证包组合、目录与分层约定、C# 13 分部属性、View 设计时绑定、共享转换器字典、跨 DLL 命名空间带 ;assembly=、纯 UTF-8（无 BOM）、XML 文档注释多行格式约束、单行注释置于被注释的变量/字段上方（禁行尾跟随）、优先使用 var 定义变量、以及编译失败迭代修复到 0 错 + 本机 DLP 环境编译验证绕法。
 agent_created: true
 ---
 
@@ -61,6 +61,16 @@ mkdir -p <AppName>/src/<AppName>/Views <AppName>/src/<AppName>/ViewModels \
 dotnet restore && dotnet build --no-restore
 ```
 
+### 编译必须 0 错通过（强制，失败即迭代修复）
+
+**生成项目后，必须实际跑通编译；只要存在编译错误，就进入「定位 → 修复 → 复编」循环，直到 0 错误为止。绝不中途交付「大概能编过」的产物。**
+
+- 构建命令（本机 DLP 环境见第六节绕行方案）：`dotnet restore && dotnet build --no-restore`。
+- 报错即修：逐条读错误（CSxxxx / MCxxxx / 警告升错误），定位文件与行号，修复后**重新完整构建**验证，不得只修不改复编。
+- 反复失败要收敛：同一错误连续两轮未过，先停止盲目改、回到根因（命名空间、引用、CPM 版本、WPF 引导、XML 注释/命名空间带 `;assembly=` 等本技能坑位），必要时缩小范围（单项目 `dotnet build <csproj>`）隔离问题，再继续。
+- 验收门槛：**0 错误**。警告原则上清零（本技能模板目标是 0 错 0 警）；确属第三方/工具链无害警告且无法消除的，需在交付说明里点名，不可默认忽略。
+- 交付前告知用户：本沙箱因 DLP 无法完整运行 WPF，最终运行验证在 VS 中做；但「能编译到 0 错」必须由本技能在本机验证完成。
+
 替换占位符（Python 递归全目录，文件名里的占位符也一并重命名）。**读取用 `utf-8-sig`（吞模板残留 BOM），写出用 `utf-8`（纯 UTF-8、无 BOM）：**
 
 ```python
@@ -86,6 +96,66 @@ public partial string Title { get; set; } = "默认值";
 - 不手工维护 `_xxx` 支持字段；属性初始化器可用（CT 8.4.2 + net10 实测）。
 - `[NotifyCanExecuteChangedFor(nameof(XxxCommand))]` 照常生效；变更回调用强类型 partial 方法 `partial void OnXxxChanged(T value)`。
 - 纯语言层也可用：定义声明 `public partial bool IsToday { get; }` 与实现声明 `public partial bool IsToday => ...;` 分置两个 partial 文件。
+
+### XML 文档注释格式（强制，多行）
+
+**生成的所有 `.cs` 代码，XML 文档注释（`///`）一律展开成多行，禁止把 `summary`/参数/返回值压成单行。**
+
+```csharp
+// 正确 —— 每个标签独立成行
+/// <summary>
+/// 计算指定区间内的消息总数。
+/// </summary>
+/// <param name="from">起始时间（含）。</param>
+/// <param name="to">结束时间（不含）。</param>
+/// <returns>匹配的消息条数。</returns>
+public int Count(DateTime from, DateTime to) => ...;
+
+// 错误 —— 禁止单行压写
+/// <summary>计算指定区间内的消息总数。</summary>
+```
+
+- 凡有公开类型 / 成员，先用多行 `/// <summary>`；含参数或返回值再补 `/// <param>` / `/// <returns>`，各占一行。
+- 该约束仅针对生成的新代码；改造既有文件时，若其已是单行注释且功能正常，可不强制展开（避免无意义改动）。
+
+### 单行注释位置（强制，置于变量/字段上方）
+
+**解释性单行注释（`//`）若用于说明某个【变量】或【字段】，一律写在该变量/字段声明的【上一行】，不得写成行尾跟随注释（trailing comment）。**
+
+```csharp
+// 正确 —— 注释在字段上方
+// 保护 _isShowingDialog 的检查与赋值（三钩子可能并发）
+private static readonly Lock ShowDialogLock = new();
+
+// 错误 —— 禁止行尾跟随
+private static readonly Lock ShowDialogLock = new(); // 保护 _isShowingDialog 的检查与赋值（三钩子可能并发）
+```
+
+- 适用范围：变量声明、类字段（`readonly` 字段、静态字段、实例字段等）的 `//` 解释性注释，统一前置。
+- 方法体语句级注释（如 `e.Handled = true;` 上方的说明）不在本强约束范围内，可灵活前置或行尾；默认仍偏好上方以保持统一风格。
+- 例外（可保留行尾）：预处理器配对标记（如 `#endif // XXX`）本身允许跟随；确实只服务于本行、移动后反而割裂可读性的极短标注——默认仍以上方为准。
+- 该约束针对生成的新代码；改造既有文件时，若其行尾注释功能正常且移动收益不大，可不强制改动（避免无意义 churn）。
+
+### 优先使用 var 定义变量（强制）
+
+**局部变量声明，只要初始化器能明确推断类型，一律用 `var`；不得显式写出本可由编译器推断的类型。**
+
+```csharp
+// 正确
+var list    = new List<MessageItem>();
+var item    = Container.Resolve<MainWindow>();
+var message = $"异常：{ex.Message}";
+var ex      = e.ExceptionObject as Exception ?? new Exception("未知错误");
+
+// 错误 —— 类型已由 RHS 明确，不必写死
+List<MessageItem> list = new();
+MainWindow mw = Container.Resolve<MainWindow>();
+```
+
+- 适用：右侧为 `new`、显式转换、已知返回类型的方法调用、字符串插值/拼接等，类型推断直观的场景。
+- 例外（保留显式类型）：① lambda 无目标类型无法推断（`Action show = () => { ... };` 不能写 `var`）；② 数值字面量需特定类型（`long n = 123;` 写 `var` 会推断成 `int`）；③ 需强调接口/基类而非具体实现（如 `IMessageService svc = new MessageService();` 凸显契约）；④ 右侧类型不直观、显式写出更利于可读性时。
+- 字段级声明：net10 下字段可用 `var` 配合 `new()` 初始化器（`private static readonly Lock Locker = new();` 本就如此）；需显式类型或 `= null!` 占位的字段维持原样。
+- 该约束针对生成的新代码；改造既有文件时，若显式类型不影响可读性且改动收益不大，可不强制改（避免无意义 churn）。
 
 ### Prism 引导
 

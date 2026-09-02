@@ -28,28 +28,40 @@ public partial class MainWindowViewModel : ObservableObject
         UpdateStatus();
     }
 
-    /// <summary>窗口标题。</summary>
+    /// <summary>
+    /// 窗口标题。
+    /// </summary>
     [ObservableProperty]
     public partial string Title { get; set; } = "__APP_NAME__";
 
-    /// <summary>副标题。</summary>
+    /// <summary>
+    /// 副标题。
+    /// </summary>
     [ObservableProperty]
     public partial string Subtitle { get; set; } = "Prism 9 + Material Design 5 + CommunityToolkit.Mvvm 8";
 
-    /// <summary>输入框内容；变化时自动刷新 AddCommand 的可用状态。</summary>
+    /// <summary>
+    /// 输入框内容；变化时自动刷新 AddCommand 的可用状态。
+    /// </summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AddCommand))]
     public partial string InputText { get; set; } = string.Empty;
 
-    /// <summary>当前选中的消息。</summary>
+    /// <summary>
+    /// 当前选中的消息。
+    /// </summary>
     [ObservableProperty]
     public partial MessageItem? SelectedMessage { get; set; }
 
-    /// <summary>状态栏文本。</summary>
+    /// <summary>
+    /// 状态栏文本。
+    /// </summary>
     [ObservableProperty]
     public partial string StatusText { get; set; } = string.Empty;
 
-    /// <summary>消息列表，绑定到 ListBox。</summary>
+    /// <summary>
+    /// 消息列表，绑定到 ListBox。
+    /// </summary>
     public ObservableCollection<MessageItem> Messages { get; } = new();
 
     /// <summary>
@@ -58,7 +70,9 @@ public partial class MainWindowViewModel : ObservableObject
     /// </summary>
     partial void OnSelectedMessageChanged(MessageItem? value) => UpdateStatus();
 
-    /// <summary>添加一条消息；输入为空时命令自动不可用。</summary>
+    /// <summary>
+    /// 添加一条消息；输入为空时命令自动不可用。
+    /// </summary>
     [RelayCommand(CanExecute = nameof(CanAdd))]
     private void Add()
     {
@@ -71,7 +85,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     private bool CanAdd() => !string.IsNullOrWhiteSpace(InputText);
 
-    /// <summary>清空列表。</summary>
+    /// <summary>
+    /// 清空列表。
+    /// </summary>
     [RelayCommand]
     private void Clear()
     {
@@ -80,7 +96,9 @@ public partial class MainWindowViewModel : ObservableObject
         UpdateStatus();
     }
 
-    /// <summary>异步加载示例数据，演示 async 命令。</summary>
+    /// <summary>
+    /// 异步加载示例数据，演示 async 命令。
+    /// </summary>
     [RelayCommand]
     private async Task LoadSampleAsync()
     {

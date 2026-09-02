@@ -14,10 +14,14 @@ namespace __APP_NAME__;
 /// </summary>
 public partial class App : PrismApplication
 {
-    /// <summary>创建主窗口（Shell）。</summary>
+    /// <summary>
+    /// 创建主窗口（Shell）。
+    /// </summary>
     protected override Window CreateShell() => Container.Resolve<MainWindow>();
 
-    /// <summary>启动早期配置 Serilog 并挂接全局异常钩子（须在 Shell 创建前，见 App.GlobalException.cs）。</summary>
+    /// <summary>
+    /// 启动早期配置 Serilog 并挂接全局异常钩子（须在 Shell 创建前，见 App.GlobalException.cs）。
+    /// </summary>
     protected override void OnStartup(StartupEventArgs e)
     {
         ConfigureLogging();
@@ -25,14 +29,18 @@ public partial class App : PrismApplication
         base.OnStartup(e);
     }
 
-    /// <summary>退出前冲刷并关闭 Serilog。</summary>
+    /// <summary>
+    /// 退出前冲刷并关闭 Serilog。
+    /// </summary>
     protected override void OnExit(ExitEventArgs e)
     {
         Log.CloseAndFlush();
         base.OnExit(e);
     }
 
-    /// <summary>注册服务与导航。契约在 Application 层，实现在 Infrastructure 层。</summary>
+    /// <summary>
+    /// 注册服务与导航。契约在 Application 层，实现在 Infrastructure 层。
+    /// </summary>
     protected override void RegisterTypes(IContainerRegistry containerRegistry)
     {
         containerRegistry.RegisterSingleton<IMessageService, MessageService>();

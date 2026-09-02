@@ -12,10 +12,13 @@ namespace __APP_NAME__;
 /// </summary>
 public partial class App
 {
-    private static readonly Lock ShowDialogLock = new(); // 保护 _isShowingDialog 的检查与赋值（三钩子可能并发）
+    // 保护 _isShowingDialog 的检查与赋值（三钩子可能并发）
+    private static readonly Lock ShowDialogLock = new();
     private static bool _isShowingDialog;
 
-    /// <summary>配置 Serilog：文件 sink 按天滚动，保留 14 天。须在挂接异常钩子之前调用。</summary>
+    /// <summary>
+    /// 配置 Serilog：文件 sink 按天滚动，保留 14 天。须在挂接异常钩子之前调用。
+    /// </summary>
     public void ConfigureLogging()
     {
         Log.Logger = new LoggerConfiguration()
@@ -29,7 +32,9 @@ public partial class App
             .CreateLogger();
     }
 
-    /// <summary>挂接全局异常钩子，须在应用启动早期调用一次。</summary>
+    /// <summary>
+    /// 挂接全局异常钩子，须在应用启动早期调用一次。
+    /// </summary>
     public void AttachGlobalExceptionHandlers()
     {
         DispatcherUnhandledException += OnDispatcherUnhandledException;
@@ -37,30 +42,39 @@ public partial class App
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
     }
 
-    /// <summary>UI 线程未处理异常：记录 + 提示，并拦截崩溃（应用继续运行）。</summary>
+    /// <summary>
+    /// UI 线程未处理异常：记录 + 提示，并拦截崩溃（应用继续运行）。
+    /// </summary>
     private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         Log.Error(e.Exception, "[Dispatcher] UI 线程未处理异常");
         ShowErrorDialog(e.Exception, isFatal: false);
-        e.Handled = true; // 阻止进程退出
+        // 阻止进程退出
+        e.Handled = true;
     }
 
-    /// <summary>进程级未处理异常（非 UI 线程 / 致命）：记录 + 提示，随后进程退出。</summary>
+    /// <summary>
+    /// 进程级未处理异常（非 UI 线程 / 致命）：记录 + 提示，随后进程退出。
+    /// </summary>
     private static void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        Exception ex = e.ExceptionObject as Exception ?? new Exception("未知错误（非 Exception 类型）。");
+        var ex = e.ExceptionObject as Exception ?? new Exception("未知错误（非 Exception 类型）。");
         Log.Fatal(ex, "[AppDomain] 进程级未处理异常");
         ShowErrorDialog(ex, isFatal: true);
     }
 
-    /// <summary>未观察 Task 异常：仅记录并标记已观察（防御性兜底，不打扰用户）。</summary>
+    /// <summary>
+    /// 未观察 Task 异常：仅记录并标记已观察（防御性兜底，不打扰用户）。
+    /// </summary>
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         Log.Error(e.Exception, "[TaskScheduler] 未观察的 Task 异常");
         e.SetObserved();
     }
 
-    /// <summary>弹窗提示（防重复弹窗；后台线程触发时调度到 UI 线程）。</summary>
+    /// <summary>
+    /// 弹窗提示（防重复弹窗；后台线程触发时调度到 UI 线程）。
+    /// </summary>
     private static void ShowErrorDialog(Exception ex, bool isFatal)
     {
         lock (ShowDialogLock)
@@ -75,7 +89,7 @@ public partial class App
 
         try
         {
-            string message =
+            var message =
                 $"程序发生未处理的异常：{ex.Message}{Environment.NewLine}{Environment.NewLine}" +
                 $"详细信息已写入日志目录：{LogDirectory}{Environment.NewLine}{Environment.NewLine}" +
                 (isFatal ? "应用即将退出，请重启。" : "应用将继续运行。");
