@@ -42,6 +42,7 @@ WPF 应用作为组合根可直引全部三层（标准做法，不算破坏分�
 | MaterialDesignThemes.MahApps | 5.3.2 | 已传递包含 MahApps.Metro |
 | Serilog | 4.4.0 | 结构化日志（WPF 应用默认日志方案） |
 | Serilog.Sinks.File | 7.0.0 | 文件 sink，按天滚动 |
+| **ValueConverters** | 3.1.22 | 常用 IValueConverter 集合（thomasgalliker，开源）。**转换器首选来源**，不重复造轮子 |
 
 建新项目时**先查 nuget.org 拿最新稳定版**再改 `Directory.Packages.props`，不要沿用旧版本号。
 
@@ -151,6 +152,20 @@ d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreata
 `App.xaml` 合并 `BundledTheme` + `MaterialDesign2.Defaults.xaml` 即可；MahApps 集成包不含汇总 Defaults 字典，靠 dll 内 Generic 主题自动生效，**不要手动合并其 XAML**。
 写 XAML 前先加载 `material-design-styles` 技能查命名样式清单。
 
+### 值转换器优先级（强制）
+
+**凡是需要 IValueConverter，先查 `ValueConverters` 包，命中即用；包里没有合适的，才写自定义转换器。** 不重复造轮子。
+
+- XAML 引用命名空间：`xmlns:vc="clr-namespace:ValueConverters;assembly=ValueConverters"`。
+- 常用现成转换器：`BoolToVisibilityConverter`、`BoolToBrushConverter`、`BoolNegationConverter`、`EnumToBoolConverter`、`NullToBoolConverter`、`StringIsNotNullOrEmptyConverter`、`DateTimeConverter`、`EnumWrapperConverter`、`ValueConverterGroup`（管道式串联多个转换）、`IsInRangeConverter` 等。
+- 命中判断：语义、参数 signature、目标类型都匹配才叫「合适」。例如「bool→Visibility 取反」直接用 `BoolToVisibilityConverter`（其 `FalseToVisibility` 可配），不必自写 `InverseBoolToVisibilityConverter`。
+- 仅在以下情况自写（放到 `<AppName>/Converters/` 下，命名 `XxxConverter`，继承 `IValueConverter` 或 `IMultiValueConverter`）：
+  1. `ValueConverters` 中确实无等价实现（如业务特有的多源聚合、复杂条件分支）；
+  2. 需要 `ConvertBack` 双向绑定且包内转换器不支持；
+  3. 参数/行为差异过大（自定义更清晰）而非强行配参。
+- 自定义转换器**用 `MarkupExtension` 写法**（`: MarkupExtension, IValueConverter`），XAML 里直接 `{vc:MyConverter}` 单例，免 `StaticResource` 注册。
+- 多个转换要串联时优先用包内 `ValueConverterGroup`，不要自写嵌套包装。
+
 ## 五、坑位清单（都已踩过，别重复）
 
 | 坑 | 现象 / 解法 |
@@ -215,8 +230,8 @@ dotnet build --no-restore -p:UseSharedCompilation=false -p:EnableDefaultPageItem
 |---|---|
 | `__APP_NAME__.slnx` | 解决方案（4 项目在 `/src/`；`Directory.Build.props` / `Directory.Packages.props` 挂在 `/解决方案项/` 文件夹下） |
 | `Directory.Build.props` | `LangVersion` / `Nullable` / `ImplicitUsings` |
-| `Directory.Packages.props` | CPM，7 个包版本集中管理 |
-| `src/__APP_NAME__/__APP_NAME__.csproj` | WPF 应用，7 个包 + 3 个项目引用 |
+| `Directory.Packages.props` | CPM，8 个包版本集中管理 |
+| `src/__APP_NAME__/__APP_NAME__.csproj` | WPF 应用，8 个包 + 3 个项目引用 |
 | `src/__APP_NAME__/App.xaml` / `.cs` | Prism 引导 + MD 主题 + Serilog/全局异常挂钩 |
 | `src/__APP_NAME__/App.GlobalException.cs` | 全局异常三钩子 + Serilog 配置（App 分部类） |
 | `src/__APP_NAME__/AssemblyInfo.cs` | `SupportedOSPlatform` + `ThemeInfo` |

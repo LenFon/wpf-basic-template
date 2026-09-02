@@ -21,6 +21,8 @@
     <!-- Serilog：结构化日志（全局异常 + 业务日志），WPF 应用默认日志方案 -->
     <PackageVersion Include="Serilog" Version="4.4.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+    <!-- 值转换器集合：转换器首选来源（命中即用，无需自写），开源稳定 -->
+    <PackageVersion Include="ValueConverters" Version="3.1.22" />
   </ItemGroup>
 
 </Project>

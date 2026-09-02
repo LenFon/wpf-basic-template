@@ -17,6 +17,7 @@
     <PackageReference Include="MaterialDesignThemes.MahApps" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="ValueConverters" />
   </ItemGroup>
 
   <ItemGroup>
