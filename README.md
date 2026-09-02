@@ -2,13 +2,13 @@
 
 WorkBuddy 技能：**WPF 标准解决方案脚手架**（含 19 个可拷贝模板文件）。
 
-基于真实项目 WeatherApp 全链路验证，一键生成 Prism 9 + Material Design 5 + CommunityToolkit.Mvvm 的 WPF 解决方案骨架。
+基于真实项目 WeatherApp 全链路验证，一键生成 Prism 9 + Material Design 5（默认 MD3 样式）+ CommunityToolkit.Mvvm 的 WPF 解决方案骨架。
 
 ## 特性
 
 | 项 | 说明 |
 |---|---|
-| 框架 | Prism 9（模块化 + DI + Region 导航）+ Material Design 5（MaterialDesignThemes） |
+| 框架 | Prism 9（模块化 + DI + Region 导航）+ Material Design 5（**默认 MD3 样式**，MaterialDesignThemes） |
 | MVVM | CommunityToolkit.Mvvm 8.4.2，**C# 13 分部属性写法**（`[ObservableProperty] public partial string Title { get; set; }`） |
 | 结构 | src/ 四层：`App`（组合根）→ `Infrastructure`（实现）→ `Application`（契约）→ `Domain`（领域模型） |
 | 包管理 | 中央包管理（CPM）：`Directory.Packages.props` 集中 7 个包版本 |
@@ -58,7 +58,7 @@ templates/
 ├── Directory.Build.props             # LangVersion / Nullable / ImplicitUsings
 ├── Directory.Packages.props          # CPM，7 个包版本集中管理
 └── src/
-    ├── __APP_NAME__/                 # WPF 应用（Prism 引导 + MD 主题 + Serilog）
+    ├── __APP_NAME__/                 # WPF 应用（Prism 引导 + MD3 主题 + Serilog）
     │   ├── App.xaml(.cs)             # Prism + DI 容器
     │   ├── App.GlobalException.cs    # 全局异常三钩子
     │   ├── Views/MainWindow.xaml(.cs)

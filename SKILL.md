@@ -1,7 +1,7 @@
 ---
 name: wpf-basic-template
-version: 1.2.5
-description: 用户标准化 WPF 脚手架（Prism 9 + Material Design 5 + CommunityToolkit.Mvvm + CPM + slnx + src 分层）。用于新建 WPF 项目/解决方案/View/UserControl，直接套用 templates/ 全套文件。内置已验证包组合、目录与分层约定、C# 13 分部属性、View 设计时绑定、共享转换器字典、跨 DLL 命名空间带 ;assembly=、纯 UTF-8（无 BOM）、XML 文档注释多行格式约束、单行注释置于被注释的变量/字段上方（禁行尾跟随）、优先使用 var 定义变量、以及编译失败迭代修复到 0 错 + 本机 DLP 环境编译验证绕法。
+version: 1.3.0
+description: 用户标准化 WPF 脚手架（Prism 9 + Material Design 5【默认 MD3 样式】+ CommunityToolkit.Mvvm + CPM + slnx + src 分层）。用于新建 WPF 项目/解决方案/View/UserControl，直接套用 templates/ 全套文件。内置已验证包组合、目录与分层约定、C# 13 分部属性、View 设计时绑定、共享转换器字典、跨 DLL 命名空间带 ;assembly=、纯 UTF-8（无 BOM）、XML 文档注释多行格式约束、单行注释置于被注释的变量/字段上方（禁行尾跟随）、优先使用 var 定义变量、以及编译失败迭代修复到 0 错 + 本机 DLP 环境编译验证绕法。
 agent_created: true
 ---
 
@@ -198,9 +198,37 @@ d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreata
   xmlns:vm="clr-namespace:PcMonitor.ViewModels"                                    <!-- 同 DLL：不带 -->
   ```
 
-### Material Design 主题
+### Material Design 主题（默认 Material Design 3）
 
-`App.xaml` 合并 `BundledTheme` + `MaterialDesign2.Defaults.xaml` 即可；MahApps 集成包靠 dll 内 Generic 主题自动生效，**不要手动合并其 XAML**。写 XAML 前先加载 `material-design-styles` 技能查命名样式清单（见下方「技能依赖」）。
+**设计语言默认 MD3**，MD2 仅作遗留兼容（见下方「切换到 MD2」）。MD3 不另写控件，而是复用 MD2 核心控件库 `MaterialDesignTheme.*`，再叠加 `MaterialDesign3.Defaults.xaml` 映射 MD3 外观，并通过 `BundledTheme.ColorAdjustment` 注入 MD3 色调对比（Secondary Container / 色调海拔）。
+
+`App.xaml` 合并 `BundledTheme`（带 `ColorAdjustment` 子元素）+ `MaterialDesign3.Defaults.xaml`：
+
+```xml
+<materialDesign:BundledTheme BaseTheme="Light"
+                             PrimaryColor="DeepPurple"
+                             SecondaryColor="Lime">
+    <materialDesign:BundledTheme.ColorAdjustment>
+        <materialDesign:ColorAdjustment Contrast="Medium" />
+    </materialDesign:BundledTheme.ColorAdjustment>
+</materialDesign:BundledTheme>
+<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+```
+
+- **`ColorAdjustment` 属性**（已验证，v5.3.2）：`materialDesign:ColorAdjustment` 有三个属性 —— `Contrast`（`None`/`Low`/`Medium`/`High`，默认 `Medium`）、`DesiredContrastRatio`（`float`，默认 `4.5f`）、`Colors`（`ColorSelection`，默认 `All`，可取 `Primary`/`Secondary`/`Neutral`/`NeutralVariant`）。它驱动 MD3 的「色调容器 / 海拔阴影」对比，是 MD3 与 MD2 观感差异的关键开关，**默认 `Contrast="Medium"` 即可**。
+- **MahApps 集成包靠 dll 内 Generic 主题自动生效，不要手动合并其 XAML**。
+- 写 XAML 前先加载 `material-design-styles` 技能查命名样式清单（见下方「技能依赖」）。MD3 下基础控件（Button/TextBox/ListBox 等）命名样式与 MD2 共用 `MaterialDesignTheme.*` 键，可直接 `StaticResource` 引用；仅 MD3 专属组件/排版（导航栏、导航抽屉、导航轨、MD3 排版等 28 个 `MaterialDesign3.*` 键）需显式引用对应 `MaterialDesign3.*` 样式。
+
+#### 切换到 MD2（仅遗留兼容）
+
+把上面两行换成 `MaterialDesign2.Defaults.xaml` 并去掉 `ColorAdjustment` 子元素即可（`BundledTheme` 仅留 `BaseTheme`/`PrimaryColor`/`SecondaryColor`）。新项目一律用 MD3。
+
+```xml
+<materialDesign:BundledTheme BaseTheme="Light"
+                             PrimaryColor="DeepPurple"
+                             SecondaryColor="Lime" />
+<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+```
 
 ### 技能依赖：material-design-styles（强制）
 
@@ -218,6 +246,7 @@ fi
 
 - 安装成功后用 Skill 工具加载 `material-design-styles` 再写 XAML。
 - 项目级共享场景：把目标路径改为 `<项目>/.workbuddy/skills/material-design-styles`（命令同上，仅换目标路径）。
+- **默认设计语言为 MD3**：命名样式选型优先取 `MaterialDesignTheme.*` 共用键（MD2/MD3 共享基础），MD3 专属组件用 `MaterialDesign3.*` 键；不要用 v4.x 旧键名（见 material-design-styles 技能「已废弃」清单）。
 - 源仓库：`https://github.com/LenFon/material-design-styles`。
 
 ### 值转换器（强制）

@@ -6,10 +6,15 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <!-- MD3 默认主题：ColorAdjustment 提供 MD3 色调对比（Secondary Container / 色调海拔），Contrast 默认 Medium -->
                 <materialDesign:BundledTheme BaseTheme="Light"
                                              PrimaryColor="DeepPurple"
-                                             SecondaryColor="Lime" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+                                             SecondaryColor="Lime">
+                    <materialDesign:BundledTheme.ColorAdjustment>
+                        <materialDesign:ColorAdjustment Contrast="Medium" />
+                    </materialDesign:BundledTheme.ColorAdjustment>
+                </materialDesign:BundledTheme>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
                 <!-- 共享值转换器字典（全局可用，View 里用 StaticResource 引用） -->
                 <ResourceDictionary Source="pack://application:,,,/Resources/Converters.xaml" />
             </ResourceDictionary.MergedDictionaries>
