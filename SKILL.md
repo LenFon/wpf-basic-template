@@ -156,14 +156,14 @@ d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreata
 
 **凡是需要 IValueConverter，先查 `ValueConverters` 包，命中即用；包里没有合适的，才写自定义转换器。** 不重复造轮子。
 
-- XAML 引用命名空间：`xmlns:vc="clr-namespace:ValueConverters;assembly=ValueConverters"`。
+- XAML 引用命名空间：`xmlns:conv="http://schemas.superdev.ch/valueconverters/2016/xaml"`。
 - 常用现成转换器：`BoolToVisibilityConverter`、`BoolToBrushConverter`、`BoolNegationConverter`、`EnumToBoolConverter`、`NullToBoolConverter`、`StringIsNotNullOrEmptyConverter`、`DateTimeConverter`、`EnumWrapperConverter`、`ValueConverterGroup`（管道式串联多个转换）、`IsInRangeConverter` 等。
 - 命中判断：语义、参数 signature、目标类型都匹配才叫「合适」。例如「bool→Visibility 取反」直接用 `BoolToVisibilityConverter`（其 `FalseToVisibility` 可配），不必自写 `InverseBoolToVisibilityConverter`。
 - 仅在以下情况自写（放到 `<AppName>/Converters/` 下，命名 `XxxConverter`，继承 `IValueConverter` 或 `IMultiValueConverter`）：
   1. `ValueConverters` 中确实无等价实现（如业务特有的多源聚合、复杂条件分支）；
   2. 需要 `ConvertBack` 双向绑定且包内转换器不支持；
   3. 参数/行为差异过大（自定义更清晰）而非强行配参。
-- 自定义转换器**用 `MarkupExtension` 写法**（`: MarkupExtension, IValueConverter`），XAML 里直接 `{vc:MyConverter}` 单例，免 `StaticResource` 注册。
+- 自定义转换器**用 `MarkupExtension` 写法**（`: MarkupExtension, IValueConverter`），XAML 里直接 `{conv:MyConverter}` 单例，免 `StaticResource` 注册。
 - 多个转换要串联时优先用包内 `ValueConverterGroup`，不要自写嵌套包装。
 
 ## 五、坑位清单（都已踩过，别重复）
