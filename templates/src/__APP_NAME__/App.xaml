@@ -10,6 +10,8 @@
                                              PrimaryColor="DeepPurple"
                                              SecondaryColor="Lime" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+                <!-- 共享值转换器字典（全局可用，View 里用 StaticResource 引用） -->
+                <ResourceDictionary Source="pack://application:,,,/Resources/Converters.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

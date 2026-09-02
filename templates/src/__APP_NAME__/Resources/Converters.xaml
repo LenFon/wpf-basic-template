@@ -1,0 +1,24 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:conv="http://schemas.superdev.ch/valueconverters/2016/xaml">
+
+    <!--
+        共享值转换器字典：所有 View 一律经本文件引用转换器，禁止以下两种写法：
+          1) 在 View 里内联 {conv:BoolToVisibilityConverter} 标记扩展；
+          2) 在各 View 局部重复定义 <conv:... x:Key/>。
+        新增转换器：先查 ValueConverters 包，命中即用；包里没有的自定义转换器放到
+        __APP_NAME__.Converters 命名空间，再在本文件注册一个 x:Key 即可。
+        本字典已在 App.xaml 的 MergedDictionaries 中全局合并，全应用可直接
+        Converter={StaticResource XxxConverter} 引用。
+    -->
+
+    <!-- ValueConverters 包现成转换器（高频） -->
+    <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    <conv:BoolNegationConverter x:Key="BoolNegationConverter" />
+
+    <!-- 自定义转换器示例（取消注释并改 __APP_NAME__ 后启用）：
+    <local:IconKeyToPackIconKindConverter x:Key="IconKeyToPackIconKindConverter"
+        xmlns:local="clr-namespace:__APP_NAME__.Converters" />
+    -->
+
+</ResourceDictionary>
