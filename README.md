@@ -9,7 +9,7 @@ WorkBuddy 技能：**WPF 标准解决方案脚手架**（含 19 个可拷贝模�
 | 项 | 说明 |
 |---|---|
 | 框架 | Prism 9（模块化 + DI + Region 导航）+ Material Design 5（**默认 MD3 样式**，MaterialDesignThemes） |
-| MVVM | CommunityToolkit.Mvvm 8.4.2，**C# 13 分部属性写法**（`[ObservableProperty] public partial string Title { get; set; }`） |
+| MVVM | CommunityToolkit.Mvvm 8.4.2，**凡 `[ObservableProperty]` 一律 C# 13 分部属性**（`[ObservableProperty] public partial string Title { get; set; }`），禁私有字段老写法，含生成后自检脚本 |
 | 结构 | src/ 四层：`App`（组合根）→ `Infrastructure`（实现）→ `Application`（契约）→ `Domain`（领域模型） |
 | 包管理 | 中央包管理（CPM）：`Directory.Packages.props` 集中 7 个包版本 |
 | 解决方案 | `.slnx`（XML 格式），`Directory.Build.props` / `Directory.Packages.props` 挂在「解决方案项」文件夹 |

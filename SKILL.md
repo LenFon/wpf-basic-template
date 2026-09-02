@@ -1,7 +1,7 @@
 ---
 name: wpf-basic-template
-version: 1.3.0
-description: 用户标准化 WPF 脚手架（Prism 9 + Material Design 5【默认 MD3 样式】+ CommunityToolkit.Mvvm + CPM + slnx + src 分层）。用于新建 WPF 项目/解决方案/View/UserControl，直接套用 templates/ 全套文件。内置已验证包组合、目录与分层约定、C# 13 分部属性、View 设计时绑定、共享转换器字典、跨 DLL 命名空间带 ;assembly=、纯 UTF-8（无 BOM）、XML 文档注释多行格式约束、单行注释置于被注释的变量/字段上方（禁行尾跟随）、优先使用 var 定义变量、以及编译失败迭代修复到 0 错 + 本机 DLP 环境编译验证绕法。
+version: 1.4.0
+description: 用户标准化 WPF 脚手架（Prism 9 + Material Design 5【默认 MD3 样式】+ CommunityToolkit.Mvvm + CPM + slnx + src 分层）。用于新建 WPF 项目/解决方案/View/UserControl，直接套用 templates/ 全套文件。内置已验证包组合、目录与分层约定、**凡 [ObservableProperty] 一律强制 C# 13 分部属性写法（禁私有字段老写法，含生成后自检脚本）**、View 设计时绑定、共享转换器字典、跨 DLL 命名空间带 ;assembly=、纯 UTF-8（无 BOM）、XML 文档注释多行格式约束、单行注释置于被注释的变量/字段上方（禁行尾跟随）、优先使用 var 定义变量、以及编译失败迭代修复到 0 错 + 本机 DLP 环境编译验证绕法。
 agent_created: true
 ---
 
@@ -82,20 +82,59 @@ for p in pathlib.Path('.').rglob('*'):
 
 ## 四、关键写法约定
 
-### C# 13 分部属性（强制）
+### 分部属性（强制）：一切 `[ObservableProperty]` 必须写成分部属性
+
+**凡标注 `[ObservableProperty]` 的可通知属性，一律声明为 C# 13 分部属性 `public partial T Xxx { get; set; }`。「私有字段 + 生成器造属性」的旧写法全面禁止，`partial` 关键字不可省略。**
 
 ```csharp
-// 正确
+// 正确 —— [ObservableProperty] + 分部属性
 [ObservableProperty]
 public partial string Title { get; set; } = "默认值";
 
-// 错误 —— 不再使用私有字段写法
-[ObservableProperty] private string _title = "默认值";
+// 错误 —— 禁止：私有字段老写法
+[ObservableProperty]
+private string _title = "默认值";
+
+// 错误 —— 禁止：非分部属性（缺 partial）
+[ObservableProperty]
+public string Title { get; set; } = "默认值";
 ```
 
-- 不手工维护 `_xxx` 支持字段；属性初始化器可用（CT 8.4.2 + net10 实测）。
-- `[NotifyCanExecuteChangedFor(nameof(XxxCommand))]` 照常生效；变更回调用强类型 partial 方法 `partial void OnXxxChanged(T value)`。
-- 纯语言层也可用：定义声明 `public partial bool IsToday { get; }` 与实现声明 `public partial bool IsToday => ...;` 分置两个 partial 文件。
+规则细化：
+
+- **不得手工维护 `_xxx` 支持字段**；属性初始化器可用（CommunityToolkit.Mvvm 8.4.2 + net10 实测）。
+- 访问修饰符按场景取 `public`（数据绑定所需）等，但 `partial` 必须保留。
+- `[NotifyCanExecuteChangedFor(nameof(XxxCommand))]`、`[NotifyPropertyChangedFor(nameof(Yyy))]` 等特性照常叠加在分部属性上，行为不变。
+- **变更回调一律用强类型 partial 方法** `partial void OnXxxChanged(T value)`，不再依赖 `On<字段名>Changed` 命名约定；另有 `OnXxxChanging(T value)`、`OnXxxChanged(T oldValue, T newValue)` 重载可选。
+- 纯语言层（非 MVVM）同样可用：定义声明 `public partial bool IsToday { get; }` 与实现声明 `public partial bool IsToday => ...;` 分置两个 partial 文件。
+
+#### 生成后自检（强制）
+
+写完含 `[ObservableProperty]` 的代码后**必须扫描校验**：任一 `[ObservableProperty]` 之后的声明若不含 `partial`、或落在 `private` 字段上，即为违规，改正后复校至输出 OK。
+
+```bash
+python - <<'EOF'
+import pathlib, re
+attr = re.compile(r'^\s*\[ObservableProperty\]\s*$')
+bad = []
+for p in pathlib.Path('src').rglob('*.cs'):
+    lines = p.read_text(encoding='utf-8').splitlines()
+    for i, ln in enumerate(lines):
+        if not attr.match(ln):
+            continue
+        # 跳过紧随其后的其它特性行，取真正的声明行
+        j = i + 1
+        while j < len(lines) and lines[j].strip().startswith('['):
+            j += 1
+        decl = lines[j] if j < len(lines) else ''
+        if 'partial' not in decl or re.search(r'\bprivate\b', decl):
+            bad.append(f"{p}:{j + 1}: {decl.strip()}")
+print('VIOLATIONS:' if bad else 'OK: 全部 [ObservableProperty] 均为分部属性')
+print('\n'.join(bad))
+EOF
+```
+
+> 该脚本在解决方案根执行（扫描 `src/` 下全部 `.cs`）。VM 常与 `.Design.cs` 成对出现，两者都在扫描范围内，均须合规。
 
 ### XML 文档注释格式（强制，多行）
 
@@ -274,6 +313,7 @@ fi
 |---|---|
 | **Prism 9 Region 命名空间重组** | `Prism.Regions` 已迁到 **`Prism.Navigation.Regions`**（IRegionManager/RegionManager/IRegion/INavigationAware/NavigationContext 在此；程序集跨 Prism.Core+Prism.Wpf）；`NavigationParameters`/`INavigationParameters`/`NavigationResult` 在 **`Prism.Navigation`**（Prism.Core）。导航代码须 `using Prism.Navigation.Regions;` + `using Prism.Navigation;`，写 `Prism.Regions` 报 CS0234。实测 9.0.537：`regionManager.RequestNavigate("ContentRegion", new Uri("XxxView", UriKind.Relative), new NavigationParameters { { "User", user } })` 可用；INavigationAware 回调 `OnNavigatedTo/From(NavigationContext)`、`IsNavigationTarget(NavigationContext)`。 |
 | **Prism.Wpf 不含 DI 容器** | 只装 Prism.Wpf → `PrismApplication` 不存在。必须另装 `Prism.DryIoc`，版本与 Prism.Wpf **严格一致**（程序集名 `Prism.DryIoc.Wpf.dll`）。 |
+| **`[ObservableProperty]` 写成私有字段 / 非分部属性** | 旧写法 `[ObservableProperty] private string _title;` 与 `[ObservableProperty] public string Title { get; set; }` 均违规：前者走「字段→生成属性」老路径、与分部属性写法割裂且耦合 `_xxx` 命名，后者缺 `partial` 直接失效。一律改 `[ObservableProperty]` + `public partial string Title { get; set; } = "";`。生成后用第四节「生成后自检」脚本扫描校验。 |
 | **CA1416 平台警告** | Prism 目标 `net6.0-windows7.0`，net10 访问 `Container` 告警。解法：`AssemblyInfo.cs` 加 `[assembly: SupportedOSPlatform("windows7.0")]`（`SupportedOSPlatformVersion` 属性无效）。 |
 | **`dotnet new wpf -f net10.0-windows` 报错** | `-f` 不接受 `-windows` 后缀。先 `-f net10.0`，模板自动把 csproj 写成 `net10.0-windows`。 |
 | **文件编码异常（UTF-16 / 带 BOM）** | 模板/生成文件若变成 UTF-16 或带 BOM，Read 工具会判 binary 且不合「纯 UTF-8（无 BOM）」约定。用 Python 写 `utf-8` 后 `os.replace` 覆盖（沙箱 `os.remove` 被 safe-delete 拦截，但 `os.replace` 可用）；**勿整文件解码重编码**（触发 DLP 注入坏字节）。 |
@@ -341,7 +381,7 @@ dotnet build --no-restore -p:UseSharedCompilation=false -p:EnableDefaultPageItem
 | `src/__APP_NAME__/AssemblyInfo.cs` | `SupportedOSPlatform` + `ThemeInfo` |
 | `src/__APP_NAME__/Resources/Converters.xaml` | 共享值转换器字典（App.xaml 全局合并，View 用 `StaticResource`） |
 | `src/__APP_NAME__/Views/MainWindow.xaml` / `.cs` | 主窗口示例（含 `d:DataContext` 设计时绑定） |
-| `src/__APP_NAME__/ViewModels/MainWindowViewModel.cs` | 分部属性 + RelayCommand 示例 |
+| `src/__APP_NAME__/ViewModels/MainWindowViewModel.cs` | `[ObservableProperty]` 全量分部属性 + RelayCommand 示例 |
 | `src/__APP_NAME__/ViewModels/MainWindowViewModel.Design.cs` | 设计器专用无参构造 + 示例数据 |
 | `src/__APP_NAME__.Domain/*` | csproj + `MessageItem.cs` + `MessageItem.Impl.cs` |
 | `src/__APP_NAME__.Application/*` | csproj + `IMessageService.cs` |
