@@ -321,6 +321,7 @@ fi
 | **CPM 被破坏** | `dotnet add package` 会把版本写死进 csproj。改版本一律编辑 `Directory.Packages.props`。 |
 | **`shutil.rmtree` 被 safe-delete 拦截** | WinError 5 且中断脚本。清理目录用 `os.replace()` 移到 `C:\Temp\WpfTrash`，不要删。 |
 | **`dotnet msbuild` 被安全策略拦截** | 判为 LOLBin。要触达标记编译改用 `dotnet build <csproj> -p:BuildProjectReferences=false`。 |
+| **`git push` 卡死在 `Pushing to ...`** | 现象：push 打印 `Pushing to <url>` 后长时间挂起（`timeout 240` 仍不返回），但 `git ls-remote` 读取正常且瞬时。根因：本机网络/DLP 对 HTTPS 的 **HTTP/2 协商**处理有缺陷，`git-receive-pack` 的 POST 上传被挂起（GET 不受影响）。解法：`git -c http.version=HTTP/1.1 push`；推荐固化到全局 `git config --global http.version HTTP/1.1`（回退：`git config --global --unset http.version`）。已实测：同一仓库强制 HTTP/1.1 后 2748 字节的包瞬间推送成功。 |
 | **PasswordBox 密码绑定** | Password 非依赖属性无法直接绑定。**唯一标准做法**：`<PasswordBox materialDesign:PasswordBoxAssist.Password="{Binding Password, UpdateSourceTrigger=PropertyChanged}" />`（MD 官方附加属性，内置双向写回，code-behind 无需桥接）。VM 侧双保险：`[ObservableProperty]` + `[NotifyCanExecuteChangedFor(nameof(LoginCommand))]` + `partial void OnPasswordChanged(string value) => LoginCommand.NotifyCanExecuteChanged();`。**不写自研附加属性、不做 code-behind 手动事件桥接**。 |
 | **`x:Name` 与类型同名报 CS0120** | `x:Name="PasswordBox"` 生成的字段与类型 `PasswordBox` 同名 → code-behind 里 `PasswordBox.Xxx` 被解析为类型静态访问 → CS0120。元素命名避开类型名（如 `PwdBox`）。 |
 
