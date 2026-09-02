@@ -1,6 +1,6 @@
 ---
 name: wpf-basic-template
-version: 1.2.0
+version: 1.2.1
 description: 用户标准化 WPF 脚手架（Prism 9 + Material Design 5 + CommunityToolkit.Mvvm + CPM + slnx + src 分层）。用于新建 WPF 项目/解决方案/View/UserControl，直接套用 templates/ 全套文件。内置已验证包组合、目录与分层约定、C# 13 分部属性、View 设计时绑定、共享转换器字典、跨 DLL 命名空间带 ;assembly=、纯 UTF-8（无 BOM），以及本机 DLP 环境编译验证绕法。
 agent_created: true
 ---
@@ -130,7 +130,25 @@ d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreata
 
 ### Material Design 主题
 
-`App.xaml` 合并 `BundledTheme` + `MaterialDesign2.Defaults.xaml` 即可；MahApps 集成包靠 dll 内 Generic 主题自动生效，**不要手动合并其 XAML**。写 XAML 前先加载 `material-design-styles` 技能查命名样式清单。
+`App.xaml` 合并 `BundledTheme` + `MaterialDesign2.Defaults.xaml` 即可；MahApps 集成包靠 dll 内 Generic 主题自动生效，**不要手动合并其 XAML**。写 XAML 前先加载 `material-design-styles` 技能查命名样式清单（见下方「技能依赖」）。
+
+### 技能依赖：material-design-styles（强制）
+
+本脚手架的 Material Design 命名样式清单来自 `material-design-styles` 技能。**每次新建 / 修改 XAML 前，先确认该技能已安装；未安装则按下方命令从 GitHub 安装（默认用户级）**：
+
+```bash
+# 检查是否已安装（Windows 用户级技能目录）
+if [ -d "$USERPROFILE/.workbuddy/skills/material-design-styles" ]; then
+  echo "material-design-styles 已安装"
+else
+  git clone https://github.com/LenFon/material-design-styles.git \
+    "$USERPROFILE/.workbuddy/skills/material-design-styles"
+fi
+```
+
+- 安装成功后用 Skill 工具加载 `material-design-styles` 再写 XAML。
+- 项目级共享场景：把目标路径改为 `<项目>/.workbuddy/skills/material-design-styles`（命令同上，仅换目标路径）。
+- 源仓库：`https://github.com/LenFon/material-design-styles`。
 
 ### 值转换器（强制）
 
